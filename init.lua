@@ -38,6 +38,12 @@ I hope you enjoy your Neovim journey,
 P.S. You can delete this when you're done too. It's your config now :)
 --]]
 
+-- disable netrw at the very start, required for nvim-tree
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
+vim.opt.background = 'light'
+
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are required (otherwise wrong leader will be used)
@@ -117,7 +123,7 @@ require('lazy').setup({
   },
 
   -- Useful plugin to show you pending keybinds.
-  { 'folke/which-key.nvim', opts = {} },
+  { 'folke/which-key.nvim',  opts = {} },
   {
     -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
@@ -201,7 +207,13 @@ require('lazy').setup({
       vim.cmd.colorscheme 'onedark'
     end,
   },
-
+  {
+    'NLKNguyen/papercolor-theme',
+    priority = 100,
+    config = function()
+      vim.cmd.colorscheme 'PaperColor'
+    end,
+  },
   {
     -- Set lualine as statusline
     'nvim-lualine/lualine.nvim',
@@ -209,7 +221,7 @@ require('lazy').setup({
     opts = {
       options = {
         icons_enabled = false,
-        theme = 'onedark',
+        theme = 'PaperColor',
         component_separators = '|',
         section_separators = '',
       },
@@ -257,11 +269,25 @@ require('lazy').setup({
     },
     build = ':TSUpdate',
   },
-
+  {
+    'nvim-tree/nvim-tree.lua',
+    version = "*",
+    lazy = false,
+    dependencies = {
+      'nvim-tree/nvim-web-devicons',
+    },
+    config = function()
+      require('nvim-tree').setup {
+        view = {
+          width = 70,
+        }
+      }
+    end,
+  },
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
   --       Uncomment any of the lines below to enable them.
-  -- require 'kickstart.plugins.autoformat',
+  require 'kickstart.plugins.autoformat',
   -- require 'kickstart.plugins.debug',
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
@@ -281,7 +307,7 @@ require('lazy').setup({
 vim.o.hlsearch = false
 
 -- Make line numbers default
--- vim.wo.number = true
+vim.wo.number = true
 vim.wo.rnu = true
 
 -- Enable mouse mode
@@ -346,6 +372,10 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 -- See `:help telescope` and `:help telescope.setup()`
 require('telescope').setup {
   defaults = {
+    wrap_results = true,
+    find_files = {
+      hidden = true,
+    },
     mappings = {
       i = {
         ['<C-u>'] = false,
@@ -422,13 +452,18 @@ vim.keymap.set('n', '<leader>sG', ':LiveGrepGitRoot<cr>', { desc = '[S]earch by 
 vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { desc = '[S]earch [D]iagnostics' })
 vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = '[S]earch [R]esume' })
 
+
+vim.keymap.set('n', '<leader>nt', ':NvimTreeToggle<cr>', { desc = '[N]VimTree [T]oggle' })
+vim.keymap.set('n', '<leader>nw', ':NvimTreeFindFile<cr>', { desc = '[N]VimTree FindFile' })
+vim.keymap.set('n', '<leader>nf', ':NvimTreeFocus<cr>', { desc = '[N]VimTree [F]ocus' })
+
 -- [[ Configure Treesitter ]]
 -- See `:help nvim-treesitter`
 -- Defer Treesitter setup after first render to improve startup time of 'nvim {filename}'
 vim.defer_fn(function()
   require('nvim-treesitter.configs').setup {
     -- Add languages to be installed here that you want installed for treesitter
-    ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'javascript', 'typescript', 'vimdoc', 'vim', 'bash' },
+    ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'javascript', 'typescript', 'vimdoc', 'vim', 'bash', 'make', 'terraform' },
 
     -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
     auto_install = false,

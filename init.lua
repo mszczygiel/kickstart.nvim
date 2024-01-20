@@ -50,6 +50,19 @@ vim.opt.background = 'light'
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
+-- auto-reload files when modified externally
+vim.o.autoread = true
+vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "CursorHoldI", "FocusGained" }, {
+  command = "if mode() != 'c' | checktime | endif",
+  pattern = { "*" },
+})
+
+-- autosave
+vim.api.nvim_create_autocmd("BufLeave", {
+  pattern = { "*" },
+  command = "wall",
+})
+
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    https://github.com/folke/lazy.nvim
 --    `:help lazy.nvim.txt` for more info
@@ -76,8 +89,8 @@ require('lazy').setup({
   -- NOTE: First, some plugins that don't require any configuration
 
   -- Git related plugins
-  'tpope/vim-fugitive',
-  'tpope/vim-rhubarb',
+  -- 'tpope/vim-fugitive',
+  -- 'tpope/vim-rhubarb',
 
   -- Detect tabstop and shiftwidth automatically
   'tpope/vim-sleuth',
@@ -266,6 +279,7 @@ require('lazy').setup({
     'nvim-treesitter/nvim-treesitter',
     dependencies = {
       'nvim-treesitter/nvim-treesitter-textobjects',
+      'nvim-treesitter/nvim-treesitter-refactor',
     },
     build = ':TSUpdate',
   },
@@ -274,15 +288,37 @@ require('lazy').setup({
     version = "*",
     lazy = false,
     dependencies = {
-      'nvim-tree/nvim-web-devicons',
+      -- 'nvim-tree/nvim-web-devicons',
     },
     config = function()
       require('nvim-tree').setup {
         view = {
           width = 70,
+        },
+        git = {
+          enable = false,
+        },
+      }
+    end,
+  },
+  {
+    'RRethy/vim-illuminate',
+    version = "*",
+    lazy = false,
+    config = function()
+      require('illuminate').configure {
+        providers = {
+          'treesitter',
+          'lsp',
+          'regex',
         }
       }
     end,
+  },
+  {
+    'towolf/vim-helm',
+    version = "*",
+    lazy = false,
   },
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
@@ -463,7 +499,7 @@ vim.keymap.set('n', '<leader>nf', ':NvimTreeFocus<cr>', { desc = '[N]VimTree [F]
 vim.defer_fn(function()
   require('nvim-treesitter.configs').setup {
     -- Add languages to be installed here that you want installed for treesitter
-    ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'javascript', 'typescript', 'vimdoc', 'vim', 'bash', 'make', 'terraform' },
+    ensure_installed = { 'c', 'cpp', 'go', 'gomod', 'lua', 'python', 'rust', 'vimdoc', 'vim', 'bash', 'make', 'cmake', 'terraform', 'yaml', 'json', 'gitignore', },
 
     -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
     auto_install = false,
